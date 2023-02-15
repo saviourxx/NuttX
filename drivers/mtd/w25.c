@@ -304,6 +304,7 @@ static ssize_t w25_write(FAR struct mtd_dev_s *dev,
 /****************************************************************************
  * Private Data
  ****************************************************************************/
+static FAR struct mtd_dev_s *mtd_w25;
 
 /****************************************************************************
  * Private Functions
@@ -1355,11 +1356,12 @@ static int w25_ioctl(FAR struct mtd_dev_s *dev, int cmd, unsigned long arg)
         }
         break;
 
-      case MTDIOC_ERASESTATE:
+      case MTDIOC_GETMTDDEV:
         {
-          FAR uint8_t *result = (FAR uint8_t *)arg;
-          *result = W25_ERASED_STATE;
-
+          FAR struct mtd_dev_s **mtd =
+            (FAR struct mtd_dev_s *)((uintptr_t)arg);
+          DEBUGASSERT(*mtd != NULL);
+          *mtd = mtd_w25;
           ret = OK;
         }
         break;
@@ -1459,6 +1461,7 @@ FAR struct mtd_dev_s *w25_initialize(FAR struct spi_dev_s *spi)
               return NULL;
             }
 #endif
+          mtd_w25=&priv->mtd;
         }
     }
 

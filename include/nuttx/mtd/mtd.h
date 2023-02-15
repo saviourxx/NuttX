@@ -74,6 +74,8 @@
 #define MTDIOC_ERASESTATE _MTDIOC(0x000a) /* IN:  Pointer to uint8_t
                                            * OUT: Byte value that represents the
                                            *      erased state of the MTD cell */
+#define MTDIOC_GETMTDDEV  _MTDIOC(0x000c) /* IN:  None
+                                           * OUT: None */
 
 /* Macros to hide implementation */
 
