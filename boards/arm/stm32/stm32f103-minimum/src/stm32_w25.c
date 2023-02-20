@@ -92,7 +92,6 @@ int stm32_w25initialize(int minor)
 #ifdef HAVE_W25
   struct spi_dev_s *spi;
   struct mtd_dev_s *mtd;
-  struct mtd_geometry_s geo;
 #if defined(CONFIG_MTD_PARTITION_NAMES)
   const char *partname = CONFIG_STM32F103MINIMUM_FLASH_PART_NAMES;
 #endif
@@ -129,15 +128,6 @@ int stm32_w25initialize(int minor)
 #else
   /* Initialize to provide SMARTFS on the MTD interface */
 
-  /* Get the geometry of the FLASH device */
-
-  ret = mtd->ioctl(mtd, MTDIOC_GEOMETRY, (unsigned long)((uintptr_t)&geo));
-  if (ret < 0)
-    {
-      syslog(LOG_ERR, "ERROR: mtd->ioctl failed: %d\n", ret);
-      return ret;
-    }
-
 #ifdef CONFIG_STM32F103MINIMUM_FLASH_PART
     {
       int partno;
@@ -149,12 +139,22 @@ int stm32_w25initialize(int minor)
       const char *ptr;
       struct mtd_dev_s *mtd_part;
       char  partref[16];
+      struct mtd_geometry_s geo;
 
       /* Now create a partition on the FLASH device */
 
       partno = 0;
       ptr = partstring;
       partoffset = 0;
+
+      /* Get the geometry of the FLASH device */
+
+      ret = mtd->ioctl(mtd, MTDIOC_GEOMETRY, (unsigned long)((uintptr_t)&geo));
+      if (ret < 0)
+        {
+          syslog(LOG_ERR, "ERROR: mtd->ioctl failed: %d\n", ret);
+          return ret;
+        }
 
       /* Get the Flash erase size */
 
