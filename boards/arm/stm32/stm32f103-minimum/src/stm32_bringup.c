@@ -214,6 +214,10 @@ int stm32_bringup(void)
     }
 #endif
 
+#ifdef CONFIG_MODEM_U_BLOX
+  stm32_ubxmdm_init(false);
+#endif
+
 #ifdef CONFIG_VIDEO_FB
   /* Initialize and register the framebuffer driver */
 

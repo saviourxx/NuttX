@@ -150,6 +150,12 @@
 #define STM32_LCD_CD      (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_50MHz|\
                            GPIO_OUTPUT_SET|GPIO_PORTA|GPIO_PIN2)
 
+#define GPIO_UBXMDM_LDO   (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_2MHz|\
+                           GPIO_OUTPUT_SET|GPIO_PORTA|GPIO_PIN15)\
+
+#define GPIO_UBXMDM_PWR   (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_2MHz|\
+                           GPIO_OUTPUT_SET|GPIO_PORTA|GPIO_PIN11)
+
 /* PWM Configuration */
 
 #define STM32F103MINIMUM_PWMTIMER   3
@@ -382,6 +388,18 @@ int stm32_ds18b20initialize(int devno);
 
 #ifdef CONFIG_CL_MFRC522
 int stm32_mfrc522initialize(const char *devpath);
+#endif
+
+/****************************************************************************
+ * Name: stm32_ubxmdm_init
+ *
+ * Description:
+ *   Initialize ubxmdm.
+ *
+ ****************************************************************************/
+
+#ifdef CONFIG_MODEM_U_BLOX
+void stm32_ubxmdm_init(bool usb_used);
 #endif
 
 #endif /* __ASSEMBLY__ */

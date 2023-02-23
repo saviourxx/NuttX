@@ -113,6 +113,10 @@ ifeq ($(CONFIG_USBMSC),y)
 CSRCS += stm32_usbmsc.c
 endif
 
+ifeq ($(CONFIG_MODEM_U_BLOX),y)
+CSRCS += stm32_ubxmdm.c
+endif
+
 DEPPATH += --dep-path board
 VPATH += :board
 CFLAGS += $(shell $(INCDIR) "$(CC)" $(TOPDIR)$(DELIM)arch$(DELIM)$(CONFIG_ARCH)$(DELIM)src$(DELIM)board$(DELIM)board)
