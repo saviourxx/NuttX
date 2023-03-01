@@ -39,7 +39,9 @@
 /* Helpers ******************************************************************/
 
 #define STM32_TIM_SETMODE(d,mode)       ((d)->ops->setmode(d,mode))
+#define STM32_TIM_GETCLOCK(d)           ((d)->ops->getclock(d))
 #define STM32_TIM_SETCLOCK(d,freq)      ((d)->ops->setclock(d,freq))
+#define STM32_TIM_GETPERIOD(d)          ((d)->ops->getperiod(d))
 #define STM32_TIM_SETPERIOD(d,period)   ((d)->ops->setperiod(d,period))
 #define STM32_TIM_GETCOUNTER(d)         ((d)->ops->getcounter(d))
 #define STM32_TIM_SETCOUNTER(d,c)       ((d)->ops->setcounter(d,c))
@@ -152,7 +154,9 @@ struct stm32_tim_ops_s
   /* Basic Timers */
 
   int  (*setmode)(struct stm32_tim_dev_s *dev, stm32_tim_mode_t mode);
+  uint32_t (*getclock)(FAR struct stm32_tim_dev_s *dev);
   int  (*setclock)(struct stm32_tim_dev_s *dev, uint32_t freq);
+  uint32_t (*getperiod)(FAR struct stm32_tim_dev_s *dev);
   void (*setperiod)(struct stm32_tim_dev_s *dev, uint32_t period);
   uint32_t (*getcounter)(struct stm32_tim_dev_s *dev);
   void (*setcounter)(struct stm32_tim_dev_s *dev, uint32_t count);

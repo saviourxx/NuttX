@@ -40,6 +40,10 @@
 
 #include "stm32.h"
 
+#ifdef CONFIG_TIMER
+#  include "stm32_tim.h"
+#endif
+
 #ifdef CONFIG_STM32_OTGFS
 #  include "stm32_usbhost.h"
 #endif
@@ -210,6 +214,15 @@ int stm32_bringup(void)
   if (ret < 0)
     {
       syslog(LOG_ERR, "Failed to initialize GPIO Driver: %d\n", ret);
+      return ret;
+    }
+#endif
+
+#ifdef CONFIG_STM32_TIM1
+  ret = stm32_timer_initialize("/dev/timer0", 1);
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to initialize timer Driver: %d\n", ret);
       return ret;
     }
 #endif

@@ -329,8 +329,10 @@ static void stm32_tim_gpioconfig(uint32_t cfg, stm32_tim_channel_t mode);
 
 static int  stm32_tim_setmode(struct stm32_tim_dev_s *dev,
                               stm32_tim_mode_t mode);
+static uint32_t stm32_tim_getclock(FAR struct stm32_tim_dev_s *dev);
 static int  stm32_tim_setclock(struct stm32_tim_dev_s *dev,
                                uint32_t freq);
+static uint32_t stm32_tim_getperiod(FAR struct stm32_tim_dev_s *dev);
 static void stm32_tim_setperiod(struct stm32_tim_dev_s *dev,
                                 uint32_t period);
 static uint32_t stm32_tim_getcounter(struct stm32_tim_dev_s *dev);
@@ -359,7 +361,9 @@ static int  stm32_tim_checkint(struct stm32_tim_dev_s *dev, int source);
 static const struct stm32_tim_ops_s stm32_tim_ops =
 {
   .setmode    = stm32_tim_setmode,
+  .getclock   = stm32_tim_getclock,
   .setclock   = stm32_tim_setclock,
+  .getperiod  = stm32_tim_getperiod,
   .setperiod  = stm32_tim_setperiod,
   .getcounter = stm32_tim_getcounter,
   .setcounter = stm32_tim_setcounter,
@@ -751,6 +755,119 @@ static int stm32_tim_setmode(struct stm32_tim_dev_s *dev,
 }
 
 /****************************************************************************
+ * Name: stm32_tim_getclock
+ ****************************************************************************/
+
+static uint32_t stm32_tim_getclock(FAR struct stm32_tim_dev_s *dev)
+{
+  uint32_t freqin;
+  uint32_t clock;
+  uint32_t prescaler;
+  DEBUGASSERT(dev != NULL);
+
+  /* Get the input clock frequency for this timer.  These vary with
+   * different timer clock sources, MCU-specific timer configuration, and
+   * board-specific clock configuration.  The correct input clock frequency
+   * must be defined in the board.h header file.
+   */
+
+  switch (((struct stm32_tim_priv_s *)dev)->base)
+    {
+#ifdef CONFIG_STM32_TIM1
+      case STM32_TIM1_BASE:
+        freqin = STM32_APB2_TIM1_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM2
+      case STM32_TIM2_BASE:
+        freqin = STM32_APB1_TIM2_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM3
+      case STM32_TIM3_BASE:
+        freqin = STM32_APB1_TIM3_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM4
+      case STM32_TIM4_BASE:
+        freqin = STM32_APB1_TIM4_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM5
+      case STM32_TIM5_BASE:
+        freqin = STM32_APB1_TIM5_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM6
+      case STM32_TIM6_BASE:
+        freqin = STM32_APB1_TIM6_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM7
+      case STM32_TIM7_BASE:
+        freqin = STM32_APB1_TIM7_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM8
+      case STM32_TIM8_BASE:
+        freqin = STM32_APB2_TIM8_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM9
+      case STM32_TIM9_BASE:
+        freqin = STM32_APB2_TIM9_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM10
+      case STM32_TIM10_BASE:
+        freqin = STM32_APB2_TIM10_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM11
+      case STM32_TIM11_BASE:
+        freqin = STM32_APB2_TIM11_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM12
+      case STM32_TIM12_BASE:
+        freqin = STM32_APB1_TIM12_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM13
+      case STM32_TIM13_BASE:
+        freqin = STM32_APB1_TIM13_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM14
+      case STM32_TIM14_BASE:
+        freqin = STM32_APB1_TIM14_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM15
+      case STM32_TIM15_BASE:
+        freqin = STM32_APB2_TIM15_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM16
+      case STM32_TIM16_BASE:
+        freqin = STM32_APB2_TIM16_CLKIN;
+        break;
+#endif
+#ifdef CONFIG_STM32_TIM17
+      case STM32_TIM17_BASE:
+        freqin = STM32_APB2_TIM17_CLKIN;
+        break;
+#endif
+      default:
+        return -EINVAL;
+    }
+
+  prescaler = stm32_getreg16(dev, STM32_BTIM_PSC_OFFSET);
+  clock = freqin / (prescaler + 1);
+  return clock;
+}
+
+/****************************************************************************
  * Name: stm32_tim_setclock
  ****************************************************************************/
 
@@ -893,6 +1010,16 @@ static int stm32_tim_setclock(struct stm32_tim_dev_s *dev, uint32_t freq)
   stm32_tim_enable(dev);
 
   return prescaler;
+}
+
+/****************************************************************************
+ * Name: stm32_tim_getperiod
+ ****************************************************************************/
+
+static uint32_t stm32_tim_getperiod (FAR struct stm32_tim_dev_s *dev)
+{
+  DEBUGASSERT(dev != NULL);
+  return stm32_getreg32 (dev, STM32_BTIM_ARR_OFFSET);
 }
 
 /****************************************************************************

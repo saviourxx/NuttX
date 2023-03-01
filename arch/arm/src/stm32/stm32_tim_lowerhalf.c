@@ -45,7 +45,9 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
 #include <errno.h>
+#include <debug.h>
 
 #include <nuttx/irq.h>
 #include <nuttx/timers/timer.h>
@@ -119,6 +121,8 @@ static int stm32_timer_handler(int irq, void * context, void * arg);
 
 static int stm32_start(struct timer_lowerhalf_s *lower);
 static int stm32_stop(struct timer_lowerhalf_s *lower);
+static int stm32_getstatus(FAR struct timer_lowerhalf_s *lower,
+                           FAR struct timer_status_s *status);
 static int stm32_settimeout(struct timer_lowerhalf_s *lower,
                             uint32_t timeout);
 static void stm32_setcallback(struct timer_lowerhalf_s *lower,
@@ -134,7 +138,7 @@ static const struct timer_ops_s g_timer_ops =
 {
   .start       = stm32_start,
   .stop        = stm32_stop,
-  .getstatus   = NULL,
+  .getstatus   = stm32_getstatus,
   .settimeout  = stm32_settimeout,
   .setcallback = stm32_setcallback,
   .ioctl       = NULL,
@@ -359,6 +363,71 @@ static int stm32_stop(struct timer_lowerhalf_s *lower)
   /* Return ENODEV to indicate that the timer was not running */
 
   return -ENODEV;
+}
+
+/****************************************************************************
+ * Name: stm32_getstatus
+ *
+ * Description:
+ *   get timer status
+ *
+ * Input Parameters:
+ *   lower  - A pointer the publicly visible representation of the "lower-
+ *            half" driver state structure.
+ *   status - The location to return the status information.
+ *
+ * Returned Value:
+ *   Zero on success; a negated errno value on failure.
+ *
+ ****************************************************************************/
+
+static int stm32_getstatus(FAR struct timer_lowerhalf_s *lower,
+                           FAR struct timer_status_s *status)
+{
+  FAR struct stm32_lowerhalf_s *priv = (FAR struct stm32_lowerhalf_s *)lower;
+  uint32_t timeout;
+  uint32_t clock;
+  uint32_t period;
+  uint32_t counter;
+
+  DEBUGASSERT(priv);
+
+  /* Return the status bit */
+
+  status->flags = 0;
+  if (priv->started)
+    {
+      status->flags |= TCFLAGS_ACTIVE;
+    }
+
+  if (priv->callback)
+    {
+      status->flags |= TCFLAGS_HANDLER;
+    }
+
+  /* Get timeout */
+
+  clock      = STM32_TIM_GETCLOCK(priv->tim);
+  period     = STM32_TIM_GETPERIOD(priv->tim);
+
+  if (clock == 1000000)
+    {
+      timeout = period;
+    }
+  else
+    {
+      timeout = ((uint64_t) period * 1000000) / clock;
+    }
+
+  status->timeout = timeout;
+
+  /* Get the time remaining until the timer expires (in microseconds) */
+
+  counter    = STM32_TIM_GETCOUNTER(priv->tim);
+  status->timeleft = ((uint64_t) (timeout - counter) * clock) / 1000000;
+  tmrinfo("timeout=%" PRIu32 " counter=%" PRIu32 "\n", timeout, counter);
+  tmrinfo("timeleft=%" PRIu32 "\n", status->timeleft);
+  return OK;
 }
 
 /****************************************************************************
