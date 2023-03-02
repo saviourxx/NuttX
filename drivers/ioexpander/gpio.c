@@ -594,7 +594,10 @@ int gpio_pin_register(FAR struct gpio_dev_s *dev, int minor)
         break;
     }
 
-  snprintf(devname, sizeof(devname), "/dev/gpio%u", (unsigned int)minor);
+  if(dev->gp_devname)
+    snprintf(devname, sizeof(devname), "/dev/%s", dev->gp_devname);
+  else
+    snprintf(devname, sizeof(devname), "/dev/gpio%u", (unsigned int)minor);
   gpioinfo("Registering %s\n", devname);
 
   return register_driver(devname, &g_gpio_drvrops, 0666, dev);
@@ -613,7 +616,10 @@ int gpio_pin_unregister(FAR struct gpio_dev_s *dev, int minor)
 {
   char devname[32];
 
-  snprintf(devname, sizeof(devname), "/dev/gpio%u", (unsigned int)minor);
+  if(dev->gp_devname)
+    snprintf(devname, sizeof(devname), "/dev/%s", dev->gp_devname);
+  else
+    snprintf(devname, sizeof(devname), "/dev/gpio%u", (unsigned int)minor);
   gpioinfo("Unregistering %s\n", devname);
 
   return unregister_driver(devname);

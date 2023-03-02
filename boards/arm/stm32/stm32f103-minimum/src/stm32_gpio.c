@@ -59,19 +59,27 @@ struct stm32gpint_dev_s
 /****************************************************************************
  * Private Function Prototypes
  ****************************************************************************/
-
+#if BOARD_NGPIOIN > 0
 static int gpin_read(struct gpio_dev_s *dev, bool *value);
+#endif
+
+#if BOARD_NGPIOOUT > 0
 static int gpout_read(struct gpio_dev_s *dev, bool *value);
 static int gpout_write(struct gpio_dev_s *dev, bool value);
+#endif
+
+#if BOARD_NGPIOINT > 0
 static int gpint_read(struct gpio_dev_s *dev, bool *value);
 static int gpint_attach(struct gpio_dev_s *dev,
                         pin_interrupt_t callback);
 static int gpint_enable(struct gpio_dev_s *dev, bool enable);
+#endif
 
 /****************************************************************************
  * Private Data
  ****************************************************************************/
 
+#if BOARD_NGPIOIN > 0
 static const struct gpio_operations_s gpin_ops =
 {
   .go_read   = gpin_read,
@@ -79,7 +87,9 @@ static const struct gpio_operations_s gpin_ops =
   .go_attach = NULL,
   .go_enable = NULL,
 };
+#endif
 
+#if BOARD_NGPIOOUT > 0
 static const struct gpio_operations_s gpout_ops =
 {
   .go_read   = gpout_read,
@@ -87,7 +97,9 @@ static const struct gpio_operations_s gpout_ops =
   .go_attach = NULL,
   .go_enable = NULL,
 };
+#endif
 
+#if BOARD_NGPIOINT > 0
 static const struct gpio_operations_s gpint_ops =
 {
   .go_read   = gpint_read,
@@ -95,6 +107,7 @@ static const struct gpio_operations_s gpint_ops =
   .go_attach = gpint_attach,
   .go_enable = gpint_enable,
 };
+#endif
 
 #if BOARD_NGPIOIN > 0
 /* This array maps the GPIO pins used as INPUT */
@@ -107,14 +120,25 @@ static const uint32_t g_gpioinputs[BOARD_NGPIOIN] =
 static struct stm32gpio_dev_s g_gpin[BOARD_NGPIOIN];
 #endif
 
-#if BOARD_NGPIOOUT
+#if BOARD_NGPIOOUT > 0
 /* This array maps the GPIO pins used as OUTPUT */
 
-static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] =
-{
-  GPIO_OUT1,
+static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] ={
+  GPIO_LED_RUN,
+  GPIO_LED_MCU,
+  GPIO_LED_GPS,
+  GPIO_CAT_PWREN,
+  GPIO_CAT_PWRKEY,
+  GPIO_NFC_PWREN,
 };
-
+static char g_gpoutdevname[BOARD_NGPIOOUT][24]={
+  "poledrun",
+  "poledmcu",
+  "poledgps",
+  "pocatpen",
+  "pocatpkey",
+  "ponfcpen",
+};
 static struct stm32gpio_dev_s g_gpout[BOARD_NGPIOOUT];
 #endif
 
@@ -133,6 +157,7 @@ static struct stm32gpint_dev_s g_gpint[BOARD_NGPIOINT];
  * Private Functions
  ****************************************************************************/
 
+#if BOARD_NGPIOINT > 0
 static int stm32gpio_interrupt(int irq, void *context, void *arg)
 {
   struct stm32gpint_dev_s *stm32gpint =
@@ -145,7 +170,9 @@ static int stm32gpio_interrupt(int irq, void *context, void *arg)
                        stm32gpint->stm32gpio.id);
   return OK;
 }
+#endif
 
+#if BOARD_NGPIOIN > 0
 static int gpin_read(struct gpio_dev_s *dev, bool *value)
 {
   struct stm32gpio_dev_s *stm32gpio =
@@ -158,7 +185,9 @@ static int gpin_read(struct gpio_dev_s *dev, bool *value)
   *value = stm32_gpioread(g_gpioinputs[stm32gpio->id]);
   return OK;
 }
+#endif
 
+#if BOARD_NGPIOOUT > 0
 static int gpout_read(struct gpio_dev_s *dev, bool *value)
 {
   struct stm32gpio_dev_s *stm32gpio =
@@ -184,7 +213,9 @@ static int gpout_write(struct gpio_dev_s *dev, bool value)
   stm32_gpiowrite(g_gpiooutputs[stm32gpio->id], value);
   return OK;
 }
+#endif
 
+#if BOARD_NGPIOINT > 0
 static int gpint_read(struct gpio_dev_s *dev, bool *value)
 {
   struct stm32gpint_dev_s *stm32gpint =
@@ -243,6 +274,7 @@ static int gpint_enable(struct gpio_dev_s *dev, bool enable)
 
   return OK;
 }
+#endif
 
 /****************************************************************************
  * Public Functions
@@ -268,6 +300,7 @@ int stm32_gpio_initialize(void)
 
       g_gpin[i].gpio.gp_pintype = GPIO_INPUT_PIN;
       g_gpin[i].gpio.gp_ops     = &gpin_ops;
+      g_gpin[i].gpio.gp_devname = NULL;
       g_gpin[i].id              = i;
       gpio_pin_register(&g_gpin[i].gpio, pincount);
 
@@ -280,12 +313,14 @@ int stm32_gpio_initialize(void)
 #endif
 
 #if BOARD_NGPIOOUT > 0
+  pincount = 0;
   for (i = 0; i < BOARD_NGPIOOUT; i++)
     {
       /* Setup and register the GPIO pin */
 
       g_gpout[i].gpio.gp_pintype = GPIO_OUTPUT_PIN;
       g_gpout[i].gpio.gp_ops     = &gpout_ops;
+      g_gpout[i].gpio.gp_devname = &g_gpoutdevname[i][0];
       g_gpout[i].id              = i;
       gpio_pin_register(&g_gpout[i].gpio, pincount);
 
@@ -299,12 +334,14 @@ int stm32_gpio_initialize(void)
 #endif
 
 #if BOARD_NGPIOINT > 0
+  pincount = 0;
   for (i = 0; i < BOARD_NGPIOINT; i++)
     {
       /* Setup and register the GPIO pin */
 
       g_gpint[i].stm32gpio.gpio.gp_pintype = GPIO_INTERRUPT_PIN;
       g_gpint[i].stm32gpio.gpio.gp_ops     = &gpint_ops;
+      g_gpout[i].stm32gpio.gpio.gp_devname = NULL;
       g_gpint[i].stm32gpio.id              = i;
       gpio_pin_register(&g_gpint[i].stm32gpio.gpio, pincount);
 

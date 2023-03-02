@@ -159,6 +159,8 @@ struct gpio_dev_s
   FAR const struct gpio_operations_s *gp_ops;
 
   /* Device specific, lower-half information may follow. */
+
+  char *gp_devname;
 };
 
 /****************************************************************************
