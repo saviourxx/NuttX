@@ -114,9 +114,13 @@ static const struct gpio_operations_s gpint_ops =
 
 static const uint32_t g_gpioinputs[BOARD_NGPIOIN] =
 {
-  GPIO_IN1,
+  GPIO_BAT_HVOL,
+  GPIO_ED_LOCK,
 };
-
+static char g_gpindevname[BOARD_NGPIOOUT][24]={
+  "pibathvol",
+  "piedlock",
+};
 static struct stm32gpio_dev_s g_gpin[BOARD_NGPIOIN];
 #endif
 
@@ -300,7 +304,7 @@ int stm32_gpio_initialize(void)
 
       g_gpin[i].gpio.gp_pintype = GPIO_INPUT_PIN;
       g_gpin[i].gpio.gp_ops     = &gpin_ops;
-      g_gpin[i].gpio.gp_devname = NULL;
+      g_gpin[i].gpio.gp_devname = &g_gpindevname[i][0];
       g_gpin[i].id              = i;
       gpio_pin_register(&g_gpin[i].gpio, pincount);
 
