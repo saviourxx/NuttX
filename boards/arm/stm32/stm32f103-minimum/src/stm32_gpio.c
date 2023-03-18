@@ -130,6 +130,7 @@ static struct stm32gpio_dev_s g_gpin[BOARD_NGPIOIN];
 static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] ={
   GPIO_LED_RUN,
   GPIO_LED_MCU,
+  GPIO_LED_CAT,
   GPIO_LED_GPS,
   GPIO_CAT_PWREN,
   GPIO_CAT_PWRKEY,
@@ -138,6 +139,7 @@ static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] ={
 static char g_gpoutdevname[BOARD_NGPIOOUT][24]={
   "poledrun",
   "poledmcu",
+  "poledcat",
   "poledgps",
   "pocatpen",
   "pocatpkey",
