@@ -34,6 +34,8 @@
 #include <nuttx/fs/fs.h>
 #include <nuttx/timers/oneshot.h>
 
+#include <arch/board/board.h>
+
 #ifdef CONFIG_USBMONITOR
 #  include <nuttx/usb/usbmonitor.h>
 #endif
@@ -216,6 +218,12 @@ int stm32_bringup(void)
       syslog(LOG_ERR, "Failed to initialize GPIO Driver: %d\n", ret);
       return ret;
     }
+#endif
+
+#ifdef CONFIG_STM32_IWDG
+  /* Initialize the watchdog timer */
+
+  stm32_iwdginitialize("/dev/watchdog0", STM32_LSI_FREQUENCY);
 #endif
 
 #ifdef CONFIG_STM32_TIM1
