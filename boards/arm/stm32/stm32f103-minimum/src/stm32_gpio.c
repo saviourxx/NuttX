@@ -134,6 +134,7 @@ static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] ={
   GPIO_LED_GPS,
   GPIO_CAT_PWREN,
   GPIO_CAT_PWRKEY,
+  GPIO_GPS_PWREN,
   GPIO_NFC_PWREN,
 };
 static char g_gpoutdevname[BOARD_NGPIOOUT][24]={
@@ -143,6 +144,7 @@ static char g_gpoutdevname[BOARD_NGPIOOUT][24]={
   "poledgps",
   "pocatpen",
   "pocatpkey",
+  "pogpspen",
   "ponfcpen",
 };
 static struct stm32gpio_dev_s g_gpout[BOARD_NGPIOOUT];

@@ -179,7 +179,7 @@
 /* GPIO pins used by the GPIO Subsystem */
 
 #define BOARD_NGPIOIN     2 /* Amount of GPIO Input pins */
-#define BOARD_NGPIOOUT    7 /* Amount of GPIO Output pins */
+#define BOARD_NGPIOOUT    8 /* Amount of GPIO Output pins */
 #define BOARD_NGPIOINT    0 /* Amount of GPIO Input w/ Interruption pins */
 
 #define GPIO_IN1          (GPIO_INPUT|GPIO_CNF_INFLOAT|GPIO_PORTA|GPIO_PIN0)
@@ -205,6 +205,9 @@
                                     GPIO_OUTPUT_CLEAR|GPIO_PORTA|GPIO_PIN15)
 #define GPIO_CAT_PWRKEY         (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_50MHz|\
                                     GPIO_OUTPUT_CLEAR|GPIO_PORTA|GPIO_PIN11)
+
+#define GPIO_GPS_PWREN          (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_50MHz|\
+                                    GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN3)
 
 #define GPIO_NFC_PWREN          (GPIO_OUTPUT|GPIO_CNF_OUTPP|GPIO_MODE_50MHz|\
                                     GPIO_OUTPUT_CLEAR|GPIO_PORTA|GPIO_PIN12)
