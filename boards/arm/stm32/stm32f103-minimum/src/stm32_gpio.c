@@ -116,10 +116,12 @@ static const uint32_t g_gpioinputs[BOARD_NGPIOIN] =
 {
   GPIO_BAT_HVOL,
   GPIO_ED_LOCK,
+  GPIO_WHE_SIG,
 };
 static char g_gpindevname[BOARD_NGPIOOUT][24]={
   "pibathvol",
   "piedlock",
+  "piwhesig",
 };
 static struct stm32gpio_dev_s g_gpin[BOARD_NGPIOIN];
 #endif
@@ -132,6 +134,7 @@ static const uint32_t g_gpiooutputs[BOARD_NGPIOOUT] ={
   GPIO_LED_MCU,
   GPIO_LED_CAT,
   GPIO_LED_GPS,
+  GPIO_EDL_PWREN,
   GPIO_CAT_PWREN,
   GPIO_CAT_PWRKEY,
   GPIO_GPS_PWREN,
@@ -142,6 +145,7 @@ static char g_gpoutdevname[BOARD_NGPIOOUT][24]={
   "poledmcu",
   "poledcat",
   "poledgps",
+  "poedlpen",
   "pocatpen",
   "pocatpkey",
   "pogpspen",
