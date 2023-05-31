@@ -317,6 +317,16 @@ int stm32_mmcsd_initialize(int minor);
 int stm32_w25initialize(int minor);
 
 /****************************************************************************
+ * Name: stm32wl5_flash_init
+ *
+ * Description:
+ *   Initialize on-board FLASH partition table
+ *
+ ****************************************************************************/
+
+int stm32_flash_init(void);
+
+/****************************************************************************
  * Name: stm32_rgbled_setup
  *
  * Description:

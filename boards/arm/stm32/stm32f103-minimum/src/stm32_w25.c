@@ -92,9 +92,6 @@ int stm32_w25initialize(int minor)
 #ifdef HAVE_W25
   struct spi_dev_s *spi;
   struct mtd_dev_s *mtd;
-#if defined(CONFIG_MTD_PARTITION_NAMES)
-  const char *partname = CONFIG_STM32F103MINIMUM_FLASH_PART_NAMES;
-#endif
 
   /* Get the SPI port */
 
@@ -214,6 +211,7 @@ int stm32_w25initialize(int minor)
           /* Set the partition name */
 
 #if defined(CONFIG_MTD_PARTITION_NAMES)
+          const char *partname = CONFIG_STM32F103MINIMUM_FLASH_PART_NAMES;
           if (!mtd_part)
             {
               syslog(LOG_ERR, "Error: failed to create partition %s\n",

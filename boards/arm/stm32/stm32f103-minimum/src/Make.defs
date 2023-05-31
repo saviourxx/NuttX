@@ -71,9 +71,13 @@ ifeq ($(CONFIG_MTD_W25),y)
   CSRCS += stm32_w25.c
 endif
 
+ifeq ($(CONFIG_STM32_FLASH_MOUNT),y)
+  CSRCS += stm32_flash.c
+endif
+
 ifeq ($(CONFIG_MTD_AT24XX),y)
 ifeq ($(CONFIG_STM32_I2C1),y)
-CSRCS += stm32_at24.c
+  CSRCS += stm32_at24.c
 endif
 endif
 
@@ -114,7 +118,7 @@ CSRCS += stm32_usbmsc.c
 endif
 
 ifeq ($(CONFIG_MODEM_U_BLOX),y)
-CSRCS += stm32_ubxmdm.c
+  CSRCS += stm32_ubxmdm.c
 endif
 
 DEPPATH += --dep-path board

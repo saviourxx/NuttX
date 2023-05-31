@@ -311,6 +311,17 @@ int stm32_bringup(void)
     {
       syslog(LOG_ERR, "ERROR: Failed to mount procfs at %s: %d\n",
              STM32_PROCFS_MOUNTPOINT, ret);
+      return ret;
+    }
+#endif
+
+#if defined(CONFIG_STM32_FLASH_MOUNT)
+  /* Register partition table for on-board FLASH memory */
+
+  ret = stm32_flash_init();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: stm32_flash_init() failed: %d\n", ret);
     }
 #endif
 
